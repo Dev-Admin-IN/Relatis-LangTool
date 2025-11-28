@@ -1,0 +1,68 @@
+<div class="token-editor-root">
+  <h2>Token Editor</h2>
+
+  <div class="status">
+    <strong>Status:</strong>
+     <div>English tokens: {{englishCount}}</div>
+     <div>Selected file: {{selectedFile}}</div>
+     <div>Missing translations: {{missingTokens?.length || 0}}</div>
+     <div *ngIf="lastError" class="last-error">Error: {{lastError}}</div>
+  </div>
+
+  <div class="controls">
+    <div>
+      <label>Upload file to server:</label>
+      <input type="file" (change)="uploadFile($event)">
+      <button (click)="loadFiles()">Refresh file list</button>
+    </div>
+    <div>
+      <label>Load English JSON from disk (no server):</label>
+      <input type="file" (change)="loadLocalEnglish($event)" accept=".json">
+      <button (click)="loadFile('en.json')">Load en.json from server</button>
+      <button (click)="loadAssetEnglish()">Load en.json from assets</button>
+    </div>
+    <div>
+      <label>Load Target Language JSON from disk (no server):</label>
+      <input type="file" (change)="loadLocalLang($event)" accept=".json">
+    </div>
+  </div>
+
+  <ul class="file-list">
+    <li *ngFor="let file of files">
+      <span style="display:inline-block;width:220px">{{file}}</span>
+      <button (click)="loadFile(file)">Load</button>
+    </li>
+  </ul>
+
+  <div *ngIf="englishCount > 0">
+    <h3>Editing: {{selectedFile || 'local'}}</h3>
+    <label>
+      <input type="checkbox" [ngModel]="showOnlyMissing" (ngModelChange)="onShowOnlyMissingChange($event)"> Show Only Missing
+    </label>
+
+    <div *ngFor="let group of tokenGroups">
+      <h4>
+        {{group.prefix}}
+        <input type="file" (change)="attachPicture($event, group.prefix)" accept="image/*">
+        <span *ngIf="group.picture"> <img [src]="group.picture" alt="Page Image" style="height:40px;vertical-align:middle;margin-left:8px"> </span>
+      </h4>
+
+      <table>
+        <tr>
+          <th>Token</th>
+          <th>English</th>
+          <th>{{lang || 'target'}}</th>
+          <th>Approve</th>
+        </tr>
+        <tr *ngFor="let token of group.tokens" [class.missing-token]="isMissing(token)">
+          <td>{{token}}</td>
+          <td>{{englishTokens[token]}}</td>
+          <td><input [(ngModel)]="tokens[token]"></td>
+          <td><input type="checkbox"></td>
+        </tr>
+      </table>
+    </div>
+
+    <button (click)="saveFile()" [disabled]="!selectedFile">Save</button>
+  </div>
+</div>

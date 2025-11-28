@@ -1,0 +1,10 @@
+/* Styles for token editor */
+.controls { margin-bottom: 12px; }
+.status { margin: 8px 0; color: #444 }
+table { width: 100%; border-collapse: collapse; margin-bottom: 16px }
+th, td { border: 1px solid #ddd; padding: 6px; }
+.group { margin-bottom: 18px; border: 1px solid #eee; padding: 8px; background: #fafafa }
+.group-header { display:flex; align-items:center; justify-content:space-between }
+.group-header h3 { margin: 0 }
+.missing-token { background: #fff7e6 } /* light yellow */
+.last-error { color: #a00; font-weight: bold }
