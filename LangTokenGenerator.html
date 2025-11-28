@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Language Token Generator</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2em; }
+    table { border-collapse: collapse; width: 100%; margin-top: 1em; }
+    th, td { border: 1px solid #ccc; padding: 8px; }
+    th { background: #f4f4f4; }
+    input[type="text"] { width: 100%; }
+    .approved { background: #d4ffd4; }
+    .pending { background: #fff4d4; }
+    .missing-token { background: #fffecb; }
+    .actions { margin-top: 1em; }
+    .toggle { margin: 1em 0; }
+    .file-list { margin: 1em 0; }
+    .file-list button { margin-right: 5px; }
+  </style>
+</head>
+<body>
+  <h1>Language Token Generator</h1>
+  <div>
+    <label>Load English JSON:</label>
+    <input type="file" id="jsonFileEn" accept=".json">
+    <button onclick="loadSampleEn()">Load Sample English JSON</button>
+    <button onclick="saveEnglish()">Save English</button>
+    <button onclick="loadEnglish()">Load Saved English</button>
+  </div>
+  <div>
+    <label>Load Target Language JSON:</label>
+    <input type="file" id="jsonFileLang" accept=".json">
+    <select id="langDropdown" onchange="onLangDropdownChange()">
+      <option value="">-- Select Language --</option>
+    </select>
+    <button onclick="saveLanguage()">Save Language</button>
+  </div>
+  <div class="toggle">
+    <label>
+      <input type="checkbox" id="showOnlyMissing" onchange="renderTable()">
+      Show Only Missing Translations
+    </label>
+  </div>
+  <div class="file-list" id="savedFiles"></div>
+  <div id="tableContainer"></div>
+  <div class="actions">
+    <button onclick="downloadTranslation()">Download Current Language JSON</button>
+    <button onclick="exportAll()">Export All Saved Files</button>
+  </div>
+  <script>
+    let englishJson = {};
+    let translationJson = {};
+    let flatEnglish = [];
+    let flatTranslation = [];
+    let missingTokens = [];
+    let currentLangCode = 'fr';
+
+    // Local Storage Keys
+    const ENGLISH_KEY = 'LangExpert_English';
+    const LANG_KEY_PREFIX = 'LangExpert_Lang_';
+
+    function loadSampleEn() {
+      // Paste your en.json here or fetch from server
+      const sample = `REPLACE_THIS_WITH_YOUR_EN_JSON`;
+      englishJson = JSON.parse(sample);
+      flatEnglish = flatten(englishJson);
+      translationJson = {};
+      flatTranslation = [];
+      missingTokens = [];
+      renderTable();
+    }
+
+    document.getElementById('jsonFileEn').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        englishJson = JSON.parse(evt.target.result);
+        flatEnglish = flatten(englishJson);
+        translationJson = {};
+        flatTranslation = [];
+        missingTokens = [];
+        renderTable();
+      };
+      reader.readAsText(file);
+    });
+
+    document.getElementById('jsonFileLang').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        translationJson = JSON.parse(evt.target.result);
+        flatTranslation = flatten(translationJson);
+        detectMissingTokens();
+        renderTable();
+      };
+      reader.readAsText(file);
+    });
+
+    document.getElementById('lang').addEventListener('input', function(e) {
+      currentLangCode = e.target.value.trim() || 'fr';
+    });
+
+    function flatten(obj, prefix = '') {
+      let res = [];
+      for (const key in obj) {
+        if (typeof obj[key] === 'object' && obj[key] !== null) {
+          res = res.concat(flatten(obj[key], prefix + key + '.'));
+        } else {
+          res.push({ token: prefix + key, value: obj[key] });
+        }
+      }
+      return res;
+    }
+
+    function unflatten(arr) {
+      const result = {};
+      arr.forEach(({ token, value }) => {
+        const keys = token.split('.');
+        let curr = result;
+        keys.forEach((k, i) => {
+          if (i === keys.length - 1) {
+            curr[k] = value;
+          } else {
+            if (!curr[k]) curr[k] = {};
+            curr = curr[k];
+          }
+        });
+      });
+      return result;
+    }
+
+    function detectMissingTokens() {
+      const translationTokens = new Set(flatTranslation.map(item => item.token));
+      missingTokens = flatEnglish
+        .filter(item => !translationTokens.has(item.token) || !getTranslationValue(item.token))
+        .map(item => item.token);
+    }
+
+    function getTranslationValue(token) {
+      const trItem = flatTranslation.find(item => item.token === token);
+      return trItem ? trItem.value : '';
+    }
+
+    function renderTable() {
+      const showOnlyMissing = document.getElementById('showOnlyMissing').checked;
+      let tokensToShow;
+      if (showOnlyMissing) {
+        tokensToShow = missingTokens;
+      } else {
+        tokensToShow = [...flatEnglish.map(item => item.token)];
+        flatTranslation.forEach(item => {
+          if (!tokensToShow.includes(item.token)) tokensToShow.push(item.token);
+        });
+      }
+
+      const container = document.getElementById('tableContainer');
+      let html = `<table>
+        <tr>
+          <th>Token</th>
+          <th>English Text</th>
+          <th>Translation (${currentLangCode || 'Language'})</th>
+          <th>Approve</th>
+        </tr>`;
+      tokensToShow.forEach((token, idx) => {
+        const enItem = flatEnglish.find(item => item.token === token);
+        const trItem = flatTranslation.find(item => item.token === token);
+        const tVal = trItem ? trItem.value : '';
+        const approved = trItem && trItem.approved;
+        const isMissing = missingTokens.includes(token);
+        html += `<tr id="row-${token.replace(/[^a-zA-Z0-9]/g,'_')}" class="${approved ? 'approved' : isMissing ? 'missing-token' : 'pending'}">
+          <td>${token}</td>
+          <td>${enItem ? enItem.value : '<i>New Token</i>'}</td>
+          <td>
+            <input type="text" value="${tVal || ''}" 
+              oninput="updateTranslation('${token}', this.value)">
+          </td>
+          <td>
+            <input type="checkbox" ${approved ? 'checked' : ''} 
+              onclick="toggleApprove('${token}', this.checked)">
+          </td>
+        </tr>`;
+      });
+      html += `</table>`;
+      container.innerHTML = html;
+      renderSavedFiles();
+    }
+
+    window.updateTranslation = function(token, value) {
+      let idx = flatTranslation.findIndex(item => item.token === token);
+      if (idx === -1) {
+        flatTranslation.push({ token, value, approved: false });
+      } else {
+        flatTranslation[idx].value = value;
+        flatTranslation[idx].approved = false;
+      }
+      detectMissingTokens();
+      renderTable();
+    };
+
+    window.toggleApprove = function(token, checked) {
+      let idx = flatTranslation.findIndex(item => item.token === token);
+      if (idx === -1) {
+        flatTranslation.push({ token, value: '', approved: checked });
+      } else {
+        flatTranslation[idx].approved = checked;
+      }
+      renderTable();
+    };
+
+    function saveEnglish() {
+      if (!englishJson || Object.keys(englishJson).length === 0) {
+        alert('No English file loaded.');
+        return;
+      }
+      localStorage.setItem(ENGLISH_KEY, JSON.stringify(englishJson));
+      alert('English reference saved!');
+      renderSavedFiles();
+    }
+
+    function loadEnglish() {
+      const data = localStorage.getItem(ENGLISH_KEY);
+      if (!data) {
+        alert('No saved English file found.');
+        return;
+      }
+      englishJson = JSON.parse(data);
+      flatEnglish = flatten(englishJson);
+      translationJson = {};
+      flatTranslation = [];
+      missingTokens = [];
+      renderTable();
+    }
+
+    function saveLanguage() {
+      if (!currentLangCode) {
+        alert('Please enter a language code.');
+        return;
+      }
+      const langObj = unflatten(flatTranslation);
+      localStorage.setItem(LANG_KEY_PREFIX + currentLangCode, JSON.stringify(langObj));
+      alert('Language file saved for: ' + currentLangCode);
+      renderSavedFiles();
+    }
+
+    function loadLanguage() {
+      if (!currentLangCode) {
+        alert('Please enter a language code.');
+        return;
+      }
+      const data = localStorage.getItem(LANG_KEY_PREFIX + currentLangCode);
+      if (!data) {
+        alert('No saved file for: ' + currentLangCode);
+        return;
+      }
+      translationJson = JSON.parse(data);
+      flatTranslation = flatten(translationJson);
+      detectMissingTokens();
+      renderTable();
+    }
+
+    function renderSavedFiles() {
+      const container = document.getElementById('savedFiles');
+      let html = '';
+      if (localStorage.getItem(ENGLISH_KEY)) {
+        html += `<b>Saved English:</b> <button onclick="downloadSavedEnglish()">Download</button><br>`;
+      }
+      let foundLang = false;
+      const dropdown = document.getElementById('langDropdown');
+      // Clear dropdown except first option
+      while (dropdown.options.length > 1) dropdown.remove(1);
+      for (let key in localStorage) {
+        if (key.startsWith(LANG_KEY_PREFIX)) {
+          foundLang = true;
+          const lang = key.substring(LANG_KEY_PREFIX.length);
+          html += `<b>Saved Language (${lang}):</b> <button onclick="downloadSavedLanguage('${lang}')">Download</button> `;
+          html += `<button onclick="loadSavedLanguage('${lang}')">Load</button> `;
+          html += `<button onclick="deleteSavedLanguage('${lang}')">Delete</button><br>`;
+          // Add to dropdown
+          const opt = document.createElement('option');
+          opt.value = lang;
+          opt.text = lang;
+          dropdown.appendChild(opt);
+        }
+      }
+    window.loadSavedLanguage = function(lang) {
+      currentLangCode = lang;
+      const data = localStorage.getItem(LANG_KEY_PREFIX + lang);
+      if (!data) {
+        alert('No saved file for: ' + lang);
+        return;
+      }
+      translationJson = JSON.parse(data);
+      flatTranslation = flatten(translationJson);
+      detectMissingTokens();
+      renderTable();
+    }
+      if (!foundLang) html += `<i>No saved language files.</i>`;
+      container.innerHTML = html;
+    }
+
+    window.downloadSavedEnglish = function() {
+      const data = localStorage.getItem(ENGLISH_KEY);
+      if (!data) return;
+      downloadFile('en.json', data);
+    };
+
+    window.downloadSavedLanguage = function(lang) {
+      const data = localStorage.getItem(LANG_KEY_PREFIX + lang);
+      if (!data) return;
+      downloadFile(lang + '.json', data);
+    };
+
+    window.deleteSavedLanguage = function(lang) {
+      localStorage.removeItem(LANG_KEY_PREFIX + lang);
+      renderSavedFiles();
+    };
+
+    function downloadTranslation() {
+      const arr = flatTranslation.map(item => ({
+        token: item.token,
+        value: item.value
+      }));
+      const langObj = unflatten(arr);
+      const langCode = currentLangCode || 'xx';
+      downloadFile(langCode + '.json', JSON.stringify(langObj, null, 2));
+    }
+
+    function downloadFile(filename, content) {
+      const blob = new Blob([content], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      a.click();
+    }
+
+    function exportAll() {
+      // Export all saved files (English + all languages)
+      if (localStorage.getItem(ENGLISH_KEY)) {
+        downloadSavedEnglish();
+      }
+      for (let key in localStorage) {
+        if (key.startsWith(LANG_KEY_PREFIX)) {
+          const lang = key.substring(LANG_KEY_PREFIX.length);
+          downloadSavedLanguage(lang);
+        }
+      }
+    }
+  </script>
+</body>
+</html>

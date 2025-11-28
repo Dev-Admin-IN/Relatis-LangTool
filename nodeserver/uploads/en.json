@@ -1,0 +1,411 @@
+{
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "messages": "Messages",
+    "all_cases": "All Cases",
+    "my_cases": "My Cases",
+    "customers": "Customers",
+    "knowledge_base": "Knowledge Base",
+    "my_workspace": "My Workspace",
+    "pinned": "Pinned",
+    "customer": "Customer",
+    "tickets": "Cases",
+    "CUSTOMER": "CUSTOMER",
+    "TICKETS": "CASES",
+    "powered_by": "Powered by",
+    "open_cases": "Open Cases",
+    "escalations": "Escalations",
+    "complaints": "Complaints",
+    "request": "Request",
+    "all": "All",
+    "administration": "Administration",
+    "user_management": "User Management",
+    "roles_privileges": "Roles & Privileges",
+    "preferences_settings": "Preferences & Settings",
+    "hidden": "Hidden",
+    "organization": "Organization",
+    "branch": "Branch",
+    "team": "Team"
+  },
+  "new": {
+    "new_branch": "New Branch",
+    "new_user": "New User",
+    "new": "New",
+    "new_team": "New Team"
+  },
+  "pinned": {
+    "customer_profile": "Customer Profile",
+    "customer_settings": "Customer Settings",
+    "open_tickets": "Open Cases",
+    "closed_tickets": "Closed Cases"
+  },
+  "top_menu": {
+    "notifications": "Notifications",
+    "select_language": "Select Language",
+    "help": "Help",
+    "settings": "Settings",
+    "welcome": "Welcome",
+    "profile": "Profile",
+    "logout": "Logout",
+    "create_reminder": "Create Reminder"
+  },
+  "pages": {
+    "all_cases": "All Cases",
+    "my_cases": "My Cases",
+    "branch": "Branch",
+    "customer": "Customer",
+    "customers": "Customers",
+    "branches": "Branches",
+    "case": "Case",
+    "cases": "Cases",
+    "message": "Message",
+    "messages": "Messages",
+    "user_management": "User Management",
+    "roles_privileges": "Roles & Privileges",
+    "preferences_settings": "Preferences & Settings",
+    "team": "Team",
+    "teams": "Teams",
+    "rules": "Rules",
+    "dashboard": "Dashboard",
+    "knowledge_base_insight": "Catalogue Articles Insight",
+    "customer_comment": "Customer Command"
+  },
+  "gridFilterIconOptions": {
+    "search": "Search",
+    "reset": "Reset",
+    "filter": "Filter",
+    "manage_columns": "Manage Columns",
+    "print": "Print",
+    "export": "Export"
+  },
+  "case_fields": {
+    "case_id": "Case ID",
+    "customer": "Customer",
+    "subject": "Subject",
+    "priority": "Priority",
+    "type": "Type",
+    "last_updated": "Last Updated",
+    "agent": "Agent",
+    "source": "Source",
+    "status": "Status",
+    "assignee": "Assignee",
+    "ticket_time": "Case Time"
+  },
+  "group_actions": {
+    "status": "Status",
+    "status_tooltip": "Change Status",
+    "claim": "Claim",
+    "claim_tooltip": "Claim Case",
+    "assign": "Assign",
+    "assign_tooltip": "Assign to Agent",
+    "link": "Link",
+    "transfer_link": "Transfer & Link",
+    "transfer": "Transfer",
+    "transfer_tooltip": "Transfer to Team",
+    "pin": "Pin",
+    "pin_tooltip": "Pin",
+    "delete": "Delete",
+    "delete_tooltip": "Delete Selected",
+    "close": "Close",
+    "ignore": "Ignore",
+    "ignore_tooltip": "Ignore selected cases",
+    "archive": "Archive",
+    "archive_tooltip": "Archive selected cases",
+    "spam": "Spam",
+    "spam_tooltip": "Mark as spam"
+  },
+
+  "team": {
+    "gridHeaders": {
+      "teamName": "Team Name",
+      "shortDescription": "Short Description",
+      "branch": "Branch",
+      "contactPerson": "Contact Person"
+    }
+  },
+
+  "user": {
+    "gridHeaders": {
+      "name": "Name",
+      "email": "Email",
+      "role": "Role",
+      "team": "Team",
+      "status": "Status",
+      "lastLogin": "Last Login",
+      "action": "Action"
+    }
+  },
+  "rules": {
+    "gridHeaders": {
+      "title": "Title",
+      "status": "Status",
+      "department": "Department",
+      "createdBy": "CreatedBy",
+      "type": "Type",
+      "lastUpdated": "Last Updated"
+    },
+    "title": "Rules",
+    "newButton": "New",
+    "breadcrumbs": {
+      "fullList": "Rules Full List",
+      "updateCreate": "Update or Create Rules"
+    },
+    "subheader": "Update or Create Rules",
+    "settings": {
+      "title": "Settings",
+      "status": "Status",
+      "department": "Department",
+      "selectDepartment": "Select Department"
+    },
+    "macros": {
+      "title": "Macros",
+      "titleLabel": "Title",
+      "titlePlaceholder": "Type title",
+      "message": "Message",
+      "internalNotes": "Internal Notes"
+    },
+    "statusValues": {
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "unknown": "Unknown"
+    },
+    "editor": {
+      "selectRule": "Select Rule",
+      "attachFiles": "Attach Files"
+    },
+    "buttons": {
+      "save": "Save / Update Rule",
+      "cancel": "Cancel"
+    }
+  },
+  "customer": {
+    "gridHeaders": {
+      "id": "ID",
+      "customer": "Customer",
+      "contact": "Contact",
+      "email": "Email",
+      "phoneno": "Phone Number",
+      "createddate": "Date Created",
+      "tags": "Tags",
+      "lastupdateddate": "Last Updated"
+    }
+  },
+  "case": {
+    "gridHeaders": {
+      "caseId": "Case ID",
+      "subject": "Subject",
+      "priority": "Priority",
+      "type": "Type",
+      "lastUpdated": "Date Created",
+      "status": "Status",
+      "agent": "Assigned To",
+      "age": "Age"
+    }
+  },
+  "branch": {
+    "gridHeaders": {
+      "name": "Branch Name",
+      "code": "Branch Code",
+      "shortName": "Short Name",
+      "country": "Country",
+      "contactPerson": "Contact Person"
+    }
+  },
+  "messages": {
+    "gridHeaders": {
+      "tags": "Tags",
+      "source": "Source",
+      "email": "Email ID",
+      "subject": "Subject",
+      "agent": "Agent",
+      "receivedAt": "Received Date & Time",
+      "received": "Received",      
+      "assigned": "Assigned To",      
+      "sentiment": "Customer Vibe"
+    }
+  },
+  "priority": {
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low"
+  },
+  "caseType": {
+    "escalation": "Escalation",
+    "complaint": "Complaint",
+    "request": "Request",
+    "feedback": "Feedback",
+    "general": "General"
+  },
+  "userStatus": {
+    "active": "Active",
+    "inactive": "Inactive",
+    "on": "On",
+    "off": "Off"
+  },
+  "caseStatus": {
+    "new": "New",
+    "open": "Open",
+    "pending": "Pending",
+    "overdue": "Overdue",
+    "on-hold": "On-Hold",
+    "solved": "Solved",
+    "closed": "Closed"
+  },
+  "source": {
+    "phone": "Phone",
+    "web": "Web",
+    "fax": "Fax",
+    "email": "Email",
+    "gmail": "Gmail",
+    "voice": "Voice"
+  },
+  "settings": {
+    "title": "Preferences & Settings",
+    "newButton": "New",
+    "authSection": "Authentication",
+    "autoDetect": "Auto Detect",
+    "saveChanges": "Save Changes",
+    "cancel": "Cancel",
+    "reset": "Reset",
+    "fields": {
+      "maxPageSize": "Maximum Page Size",
+      "perPage": "Per Page",
+      "autoRefresh": "Auto Refresh Rate",
+      "refreshRateText": "Tickets page refresh rate in minutes",
+      "fromName": "Default From Name",
+      "fromNameText": "From name to use when replying to a thread",
+      "ticketQueue": "Default Ticket Queue",
+      "threadOrder": "Thread View Order",
+      "threadOrderText": "The order of thread entries",
+      "signature": "Default Signature",
+      "signatureText": "This can be selected when replying to a thread",
+      "paperSize": "Default Paper Size",
+      "paperSizeText": "Paper size used when printing tickets to PDF",
+      "replyRedirect": "Reply Redirect",
+      "replyRedirectText": "Redirect URL used after replying to a ticket",
+      "imageAttachment": "Image Attachment View",
+      "imageAttachmentText": "Open image attachments in new tab or directly download (CTRL + Right Click)",
+      "editorSpacing": "Editor Spacing",
+      "editorSpacingText": "Set the editor spacing to Single or Double when pressing Enter",
+      "timeZone": "Time Zone",
+      "timeFormat": "Time Format"
+    },
+    "placeholders": {
+      "showRecords": "Show 20 records",
+      "disabled": "-Disabled-",
+      "emailName": "Email Address Name",
+      "systemDefault": "-System Default-",
+      "none": "-None-",
+      "letter": "Letter",
+      "ticket": "-Case-",
+      "download": "Download",
+      "double": "Double"
+    }
+  },
+
+  "organization": {
+    "title": {
+      "edit": "Edit Organization",
+      "create": "Create Organization"
+    },
+    "buttons": {
+      "update": "Update",
+      "save": "Save",
+      "cancel": "Cancel",
+      "reset": "Reset"
+    },
+    "fields": {
+      "orgName": "Organization Name",
+      "orgShortName": "Short Name",
+      "registrationNumber": "Comp.Reg.No",
+      "buildingOrBlkno": "Building / Blk No",
+      "street": "Street",
+      "unitOrDept": "Unit / Dept",
+      "city": "City",
+      "state": "State",
+      "postalCode": "Postal Code",
+      "contactNo": "Contact No",
+      "contactPerson": "Contact Person Name",
+      "email": "Email",
+      "country": "Country",
+      "orgLogo": "Organization Logo",
+      "favicon": "Favicon Logo",
+      "allowBranch": "Allow branch setup",
+      "host": "Host",
+      "port": "Port",
+      "username": "Username",
+      "password": "Password",
+      "folder": "Folder",
+      "providerName": "Provider Name",
+      "select": "Select"
+    },
+    "placeholders": {
+      "orgName": "Enter Organization Name",
+      "orgShortName": "Enter Short Name",
+      "registrationNumber": "Enter Registration Number",
+      "buildingOrBlkno": "Enter Building / Blk No",
+      "street": "Enter Street",
+      "unitOrDept": "Enter Unit or Department",
+      "city": "Enter City",
+      "state": "Enter State",
+      "postalCode": "Enter Postal Code",
+      "contactNo": "Enter Contact Number",
+      "contactPerson": "Enter Contact Person Name",
+      "email": "Enter Email",
+      "host": "Enter host address",
+      "port": "Enter port number",
+      "username": "Enter username",
+      "password": "Enter password",
+      "folder": "Enter folder name"
+    },
+    "sections": {
+      "emailSettings": "Email Settings"
+    },
+    "toggle": {
+      "on": "On",
+      "off": "Off"
+    }
+  },
+  "profile": {
+    "title": "Profile Settings",
+    "newButton": "New",
+    "personalInfo": {
+      "title": "Personal Info",
+      "addImage": "Add Image",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email Address",
+      "addEmail": "+",
+      "phone": "Phone Number",
+      "extension": "Ext"
+    },
+    "authentication": {
+      "title": "Authentication",
+      "backend": "Backend",
+      "username": "Username *",
+      "changePassword": "Change Password",
+      "cc": "Cc",
+      "configureOptions": "Configure Options",
+      "disable": "- Disable -"
+    },
+    "status": {
+      "title": "Status Settings",
+      "vacation": "Vacation Mode"
+    },
+    "removeprofile": {
+      "title": "Profile Deletion",
+      "field": "Request of removal personal information from the Application"
+    },
+    "signature": {
+      "title": "Signature",
+      "description": "Optional signature used on outgoing emails. Signature is made available as a choice, on case reply."
+    },
+    "buttons": {
+      "save": "Save Changes",
+      "cancel": "Cancel",
+      "reset": "Reset",
+      "attachFiles": "Attach Files",
+      "selectRule": "Select Rule"
+    }
+  }
+}
