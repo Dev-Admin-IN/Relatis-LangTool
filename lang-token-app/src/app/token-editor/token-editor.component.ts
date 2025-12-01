@@ -34,7 +34,7 @@ export class TokenEditorComponent implements OnInit {
   ngOnInit(): void {
     this.loadFiles();
     // Try to auto-load en.json from server first, then fallback to localStorage
-    this.http.get('http://13.232.222.176:88/file/en.json').subscribe(
+    this.http.get('https://dev.relatis.io:9444/file/en.json').subscribe(
       (data: any) => {
         this.englishTokens = this.flatten(data);
         this.detectMissing();
@@ -64,7 +64,7 @@ export class TokenEditorComponent implements OnInit {
 
   loadFiles() {
     // Attempt to list files from server; ignore errors
-    this.http.get<string[]>('http://13.232.222.176:88/files').subscribe(
+    this.http.get<string[]>('https://dev.relatis.io:9444/files').subscribe(
       files => this.files = files,
       () => { /* ignore server listing errors */ this.lastError = 'Could not fetch file list from server (server may be down)'; }
     );
@@ -75,7 +75,7 @@ export class TokenEditorComponent implements OnInit {
     this.selectedFile = name;
     this.lang = name.replace(/\.json$/i, '');
     console.log('Loading file from server:', name);
-    this.http.get(`http://13.232.222.176:88/file/${name}`).subscribe(
+    this.http.get(`https://dev.relatis.io:9444/file/${name}`).subscribe(
       (data: any) => {
         const flat = this.flatten(data);
         if (name.toLowerCase() === 'en.json') {
@@ -102,7 +102,7 @@ export class TokenEditorComponent implements OnInit {
     if (!file) return;
     const form = new FormData();
     form.append('file', file, file.name);
-    this.http.post('http://13.232.222.176:88/upload', form).subscribe(
+    this.http.post('https://dev.relatis.io:9444/upload', form).subscribe(
       () => this.loadFiles(),
       err => alert('Upload failed: ' + (err.message || err.statusText || err.status))
     );
@@ -157,7 +157,7 @@ export class TokenEditorComponent implements OnInit {
       return;
     }
     const payload = this.unflattenToObject(this.tokens);
-    this.http.post(`http://13.232.222.176:88/save/${this.selectedFile}`, payload).subscribe(
+    this.http.post(`https://dev.relatis.io:9444/save/${this.selectedFile}`, payload).subscribe(
       () => alert('Saved!'),
       err => {
         console.error('Save failed, falling back to download', err);
