@@ -3,12 +3,12 @@
 
   <div class="status">
     <strong>Status:</strong>
-     <div>English tokens: {{englishCount}}</div>
-     <div>Selected file: {{selectedFile}}</div>
-     <div>Missing translations: {{missingTokens?.length || 0}}</div>
-     <div *ngIf="lastError" class="last-error">Error: {{lastError}}</div>
+    <div>English tokens: {{englishCount}}</div>
+    <div>Selected file: {{selectedFile}}</div>
+    <div>Missing translations: {{missingTokens?.length || 0}}</div>
+    <div *ngIf="lastError" class="last-error">Error: {{lastError}}</div>
   </div>
-
+  <!--
   <div class="controls">
     <div>
       <label>Upload file to server:</label>
@@ -16,16 +16,18 @@
       <button (click)="loadFiles()">Refresh file list</button>
     </div>
     <div>
-      <label>Load English JSON from disk (no server):</label>
+      <label>Load English JSON from Application:</label>
       <input type="file" (change)="loadLocalEnglish($event)" accept=".json">
       <button (click)="loadFile('en.json')">Load en.json from server</button>
-      <button (click)="loadAssetEnglish()">Load en.json from assets</button>
+      <button (click)="loadAssetEnglish()">Load en.json</button>
     </div>
     <div>
       <label>Load Target Language JSON from disk (no server):</label>
       <input type="file" (change)="loadLocalLang($event)" accept=".json">
     </div>
   </div>
+-->
+  <h3>Available Files on Server:</h3>
 
   <ul class="file-list">
     <li *ngFor="let file of files">
@@ -37,14 +39,20 @@
   <div *ngIf="englishCount > 0">
     <h3>Editing: {{selectedFile || 'local'}}</h3>
     <label>
-      <input type="checkbox" [ngModel]="showOnlyMissing" (ngModelChange)="onShowOnlyMissingChange($event)"> Show Only Missing
+      <input type="checkbox" [ngModel]="showOnlyMissing" (ngModelChange)="onShowOnlyMissingChange($event)"> Show Only
+      Missing
     </label>
 
     <div *ngFor="let group of tokenGroups">
       <h4>
         {{group.prefix}}
-        <input type="file" (change)="attachPicture($event, group.prefix)" accept="image/*">
-        <span *ngIf="group.picture"> <img [src]="group.picture" alt="Page Image" style="height:40px;vertical-align:middle;margin-left:8px"> </span>
+        <input type="file" id="file-{{group.prefix}}" (change)="attachPicture($event, group.prefix)" accept="image/*"
+          style="display:none">
+        <label for="file-{{group.prefix}}" class="upload-icon" title="Upload Image">📷</label>
+        <span *ngIf="group.picture">
+          <img [src]="group.picture" alt="Page Image"
+            style="height:40px;vertical-align:middle;margin-left:8px;cursor:pointer" (click)="openImage(group.picture)">
+        </span>
       </h4>
 
       <table>
@@ -64,5 +72,12 @@
     </div>
 
     <button (click)="saveFile()" [disabled]="!selectedFile">Save</button>
+  </div>
+
+  <div class="image-modal" *ngIf="expandedImage" (click)="closeImage()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <img [src]="expandedImage" alt="Expanded View">
+      <button class="close-btn" (click)="closeImage()">×</button>
+    </div>
   </div>
 </div>

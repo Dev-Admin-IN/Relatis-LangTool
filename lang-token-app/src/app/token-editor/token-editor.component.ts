@@ -24,15 +24,27 @@ export class TokenEditorComponent implements OnInit {
 
   tokenPictures: { [prefix: string]: string } = {};
   lastError: string = '';
+  expandedImage: string | null = null;
 
   // Local storage keys used by the plain HTML tool - keep compatibility
   private ENGLISH_KEY = 'LangExpert_English';
   private LANG_KEY_PREFIX = 'LangExpert_Lang_';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
+
+  openImage(url: string | undefined) {
+    if (url) {
+      this.expandedImage = url;
+    }
+  }
+
+  closeImage() {
+    this.expandedImage = null;
+  }
 
   ngOnInit(): void {
     this.loadFiles();
+    this.loadImages();
     // Try to auto-load en.json from server first, then fallback to localStorage
     this.http.get('https://dev.relatis.io:9444/file/en.json').subscribe(
       (data: any) => {
@@ -42,7 +54,7 @@ export class TokenEditorComponent implements OnInit {
         this.selectedFile = 'en.json';
         this.lang = 'en';
         console.log('Loaded en.json from server, tokens:', Object.keys(this.englishTokens).length);
-  },
+      },
       () => {
         const saved = localStorage.getItem(this.ENGLISH_KEY);
         if (saved) {
@@ -65,7 +77,9 @@ export class TokenEditorComponent implements OnInit {
   loadFiles() {
     // Attempt to list files from server; ignore errors
     this.http.get<string[]>('https://dev.relatis.io:9444/files').subscribe(
-      files => this.files = files,
+      files => {
+        this.files = files.filter(f => f.toLowerCase().endsWith('.json') && f.toLowerCase() !== 'images.json');
+      },
       () => { /* ignore server listing errors */ this.lastError = 'Could not fetch file list from server (server may be down)'; }
     );
     console.log('Requested file list from server');
@@ -81,10 +95,10 @@ export class TokenEditorComponent implements OnInit {
         if (name.toLowerCase() === 'en.json') {
           this.englishTokens = flat;
           // also save to localStorage for offline use
-          try { localStorage.setItem(this.ENGLISH_KEY, JSON.stringify(data)); } catch {}
+          try { localStorage.setItem(this.ENGLISH_KEY, JSON.stringify(data)); } catch { }
         } else {
           this.tokens = flat;
-          try { localStorage.setItem(this.LANG_KEY_PREFIX + this.lang, JSON.stringify(this.unflattenToObject(this.tokens))); } catch {}
+          try { localStorage.setItem(this.LANG_KEY_PREFIX + this.lang, JSON.stringify(this.unflattenToObject(this.tokens))); } catch { }
         }
         this.detectMissing();
       },
@@ -117,7 +131,7 @@ export class TokenEditorComponent implements OnInit {
       try {
         const parsed = JSON.parse(e.target.result);
         this.englishTokens = this.flatten(parsed);
-        try { localStorage.setItem(this.ENGLISH_KEY, JSON.stringify(parsed)); } catch {}
+        try { localStorage.setItem(this.ENGLISH_KEY, JSON.stringify(parsed)); } catch { }
         this.detectMissing();
         this.selectedFile = 'en.json';
         this.lang = 'en';
@@ -137,11 +151,11 @@ export class TokenEditorComponent implements OnInit {
     reader.onload = (e: any) => {
       try {
         const parsed = JSON.parse(e.target.result);
-  this.tokens = this.flatten(parsed);
-  this.selectedFile = file.name;
-  this.lang = file.name.replace(/\.json$/i, '');
-  console.log('Loaded target language from local file', this.lang, 'tokens:', Object.keys(this.tokens).length);
-        try { localStorage.setItem(this.LANG_KEY_PREFIX + this.lang, JSON.stringify(parsed)); } catch {}
+        this.tokens = this.flatten(parsed);
+        this.selectedFile = file.name;
+        this.lang = file.name.replace(/\.json$/i, '');
+        console.log('Loaded target language from local file', this.lang, 'tokens:', Object.keys(this.tokens).length);
+        try { localStorage.setItem(this.LANG_KEY_PREFIX + this.lang, JSON.stringify(parsed)); } catch { }
         this.detectMissing();
       } catch (err) {
         alert('Invalid JSON file');
@@ -228,27 +242,89 @@ export class TokenEditorComponent implements OnInit {
     // Only recompute when version changed
     if (this.lastComputedVersion === this.tokensVersion) return;
     this.lastComputedVersion = this.tokensVersion;
-    const tokens = this.getTokensToShow();
+
+    // Get all potential tokens (union of english and target)
+    const keys = new Set<string>(Object.keys(this.englishTokens || {}));
+    Object.keys(this.tokens || {}).forEach(k => keys.add(k));
+    const allTokens = Array.from(keys).sort();
+
+    // Group them first
     const map: { [p: string]: string[] } = {};
-    tokens.forEach(t => {
+    allTokens.forEach(t => {
       const prefix = t.split('.')[0] || 'root';
       if (!map[prefix]) map[prefix] = [];
       map[prefix].push(t);
     });
-    this.tokenGroups = Object.keys(map).sort().map(p => ({ prefix: p, tokens: map[p], picture: this.tokenPictures[p] }));
+
+    let groups = Object.keys(map).sort().map(p => ({ prefix: p, tokens: map[p], picture: this.tokenPictures[p] }));
+
+    // Apply filter if needed
+    if (this.showOnlyMissing) {
+      groups = groups.filter(g => {
+        // Show group ONLY if ALL tokens in it are missing
+        return g.tokens.every(t => this.isMissing(t));
+      });
+    }
+
+    this.tokenGroups = groups;
   }
 
   onShowOnlyMissingChange(v: boolean) {
     this.showOnlyMissing = !!v;
+    this.lastComputedVersion = -1; // Force recompute
     this.computeGroups();
   }
 
   attachPicture(event: any, prefix: string) {
     const f = event.target.files && event.target.files[0];
     if (!f) return;
-    const r = new FileReader();
-    r.onload = (e: any) => this.tokenPictures[prefix] = e.target.result;
-    r.readAsDataURL(f);
+
+    // Upload image to server first
+    const form = new FormData();
+    form.append('file', f, f.name);
+    this.http.post('https://dev.relatis.io:9444/upload', form).subscribe(
+      () => {
+        // On success, save the mapping
+        // We use the filename as the reference
+        // Assuming server serves files at /file/:filename
+        const imageUrl = `https://dev.relatis.io:9444/file/${f.name}`;
+        this.tokenPictures[prefix] = imageUrl;
+        this.saveImages();
+
+        // Update local view immediately (optional, but good for UX)
+        const r = new FileReader();
+        r.onload = (e: any) => {
+          // We already set the URL, but for immediate feedback we could use data URL
+          // However, since we set tokenPictures[prefix] to the server URL, 
+          // we should probably trigger a re-render.
+          // But wait, if we use the server URL, the browser will fetch it.
+          // Let's just force recompute to update the view.
+          this.lastComputedVersion = -1;
+          this.computeGroups();
+        };
+        r.readAsDataURL(f);
+      },
+      err => alert('Image upload failed: ' + (err.message || err.statusText || err.status))
+    );
+  }
+
+  saveImages() {
+    this.http.post('https://dev.relatis.io:9444/save/images.json', this.tokenPictures).subscribe(
+      () => console.log('Images metadata saved'),
+      err => console.error('Failed to save images metadata', err)
+    );
+  }
+
+  loadImages() {
+    this.http.get<{ [prefix: string]: string }>('https://dev.relatis.io:9444/file/images.json').subscribe(
+      data => {
+        this.tokenPictures = data || {};
+        this.lastComputedVersion = -1;
+        this.computeGroups();
+        console.log('Loaded images metadata');
+      },
+      () => console.log('No images metadata found (or failed to load)')
+    );
   }
 
   // Flatten nested object -> { 'a.b.c': value }
