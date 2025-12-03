@@ -53,9 +53,18 @@ describe('TokenEditorComponent', () => {
     component.onShowOnlyMissingChange(true);
 
     const groups = component.tokenGroups;
-    // Should only contain Group A
-    expect(groups.length).toBe(1);
+
+    // Group A should be shown (all missing)
+    // Group B should be shown (mixed), but only token2
+    // Group C should be hidden (all present)
+    expect(groups.length).toBe(2);
+
     expect(groups[0].prefix).toBe('groupA');
+    expect(groups[0].tokens.length).toBe(2);
+
+    expect(groups[1].prefix).toBe('groupB');
+    expect(groups[1].tokens.length).toBe(1);
+    expect(groups[1].tokens[0]).toBe('groupB.token2');
   });
 
   it('should load images on init', () => {
@@ -104,5 +113,16 @@ describe('TokenEditorComponent', () => {
     req.flush(mockFiles);
 
     expect(component.files).toEqual(['en.json', 'fr.json']);
+  });
+
+  it('should toggle group collapse state', () => {
+    const prefix = 'groupA';
+    expect(component.isCollapsed(prefix)).toBeFalse();
+
+    component.toggleGroup(prefix);
+    expect(component.isCollapsed(prefix)).toBeTrue();
+
+    component.toggleGroup(prefix);
+    expect(component.isCollapsed(prefix)).toBeFalse();
   });
 });

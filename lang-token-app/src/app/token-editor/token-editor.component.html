@@ -43,32 +43,37 @@
       Missing
     </label>
 
-    <div *ngFor="let group of tokenGroups">
-      <h4>
+    <div *ngFor="let group of tokenGroups" class="group-container">
+      <h4 (click)="toggleGroup(group.prefix)" class="group-header">
+        <span class="arrow" [class.collapsed]="isCollapsed(group.prefix)">▼</span>
         {{group.prefix}}
         <input type="file" id="file-{{group.prefix}}" (change)="attachPicture($event, group.prefix)" accept="image/*"
-          style="display:none">
-        <label for="file-{{group.prefix}}" class="upload-icon" title="Upload Image">📷</label>
+          style="display:none" (click)="$event.stopPropagation()">
+        <label for="file-{{group.prefix}}" class="upload-icon" title="Upload Image"
+          (click)="$event.stopPropagation()">📷</label>
         <span *ngIf="group.picture">
           <img [src]="group.picture" alt="Page Image"
-            style="height:40px;vertical-align:middle;margin-left:8px;cursor:pointer" (click)="openImage(group.picture)">
+            style="height:40px;vertical-align:middle;margin-left:8px;cursor:pointer"
+            (click)="openImage(group.picture); $event.stopPropagation()">
         </span>
       </h4>
 
-      <table>
-        <tr>
-          <th>Token</th>
-          <th>English</th>
-          <th>{{lang || 'target'}}</th>
-          <th>Approve</th>
-        </tr>
-        <tr *ngFor="let token of group.tokens" [class.missing-token]="isMissing(token)">
-          <td>{{token}}</td>
-          <td>{{englishTokens[token]}}</td>
-          <td><input [(ngModel)]="tokens[token]"></td>
-          <td><input type="checkbox"></td>
-        </tr>
-      </table>
+      <div *ngIf="!isCollapsed(group.prefix)">
+        <table>
+          <tr>
+            <th>Token</th>
+            <th>English</th>
+            <th>{{lang || 'target'}}</th>
+            <th>Approve</th>
+          </tr>
+          <tr *ngFor="let token of group.tokens" [class.missing-token]="isMissing(token)">
+            <td>{{token}}</td>
+            <td>{{englishTokens[token]}}</td>
+            <td><input [(ngModel)]="tokens[token]"></td>
+            <td><input type="checkbox"></td>
+          </tr>
+        </table>
+      </div>
     </div>
 
     <button (click)="saveFile()" [disabled]="!selectedFile">Save</button>

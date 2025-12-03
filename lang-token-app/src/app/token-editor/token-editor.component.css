@@ -34,6 +34,7 @@ h4 {
 table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
 }
 
 th,
@@ -117,4 +118,54 @@ input[type="text"] {
 
 .upload-icon:hover {
   opacity: 0.8;
+}
+
+/* Accordion Styles */
+.group-header {
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+}
+
+.group-header:hover {
+  background-color: #f9f9f9;
+}
+
+.arrow {
+  display: inline-block;
+  margin-right: 8px;
+  font-size: 12px;
+  transition: transform 0.2s;
+}
+
+.arrow.collapsed {
+  transform: rotate(-90deg);
+}
+
+/* Token Column */
+table th:nth-child(1),
+table td:nth-child(1) {
+  width: 30%;
+  word-break: break-all;
+}
+
+/* English Column */
+table th:nth-child(2),
+table td:nth-child(2) {
+  width: 30%;
+  word-break: break-word;
+}
+
+/* Target Column */
+table th:nth-child(3),
+table td:nth-child(3) {
+  width: 30%;
+}
+
+/* Approve Column */
+table th:nth-child(4),
+table td:nth-child(4) {
+  width: 10%;
+  text-align: center;
 }

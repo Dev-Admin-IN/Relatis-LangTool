@@ -32,6 +32,20 @@ export class TokenEditorComponent implements OnInit {
 
   constructor(private http: HttpClient) { }
 
+  collapsedGroups = new Set<string>();
+
+  toggleGroup(prefix: string) {
+    if (this.collapsedGroups.has(prefix)) {
+      this.collapsedGroups.delete(prefix);
+    } else {
+      this.collapsedGroups.add(prefix);
+    }
+  }
+
+  isCollapsed(prefix: string): boolean {
+    return this.collapsedGroups.has(prefix);
+  }
+
   openImage(url: string | undefined) {
     if (url) {
       this.expandedImage = url;
@@ -260,10 +274,10 @@ export class TokenEditorComponent implements OnInit {
 
     // Apply filter if needed
     if (this.showOnlyMissing) {
-      groups = groups.filter(g => {
-        // Show group ONLY if ALL tokens in it are missing
-        return g.tokens.every(t => this.isMissing(t));
-      });
+      groups = groups.map(g => ({
+        ...g,
+        tokens: g.tokens.filter(t => this.isMissing(t))
+      })).filter(g => g.tokens.length > 0);
     }
 
     this.tokenGroups = groups;
