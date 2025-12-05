@@ -114,6 +114,7 @@ input[type="text"] {
   font-size: 24px;
   vertical-align: middle;
   margin-left: 10px;
+  margin-bottom: 12px;
 }
 
 .upload-icon:hover {
@@ -168,4 +169,20 @@ table th:nth-child(4),
 table td:nth-child(4) {
   width: 10%;
   text-align: center;
+}
+
+.save-button-container {
+  margin-top: 20px;
+  text-align: right;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 20px;
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  background: white;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
 }

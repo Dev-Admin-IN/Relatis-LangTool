@@ -36,7 +36,7 @@
     </li>
   </ul>
 
-  <div *ngIf="englishCount > 0">
+  <div *ngIf="englishCount > 0 || tokensCount > 0">
     <h3>Editing: {{selectedFile || 'local'}}</h3>
     <label>
       <input type="checkbox" [ngModel]="showOnlyMissing" (ngModelChange)="onShowOnlyMissingChange($event)"> Show Only
@@ -75,7 +75,6 @@
         </table>
       </div>
     </div>
-
     <button (click)="saveFile()" [disabled]="!selectedFile">Save</button>
   </div>
 

@@ -63,6 +63,11 @@ export class TokenEditorComponent implements OnInit {
     this.http.get('https://dev.relatis.io:9444/file/en.json').subscribe(
       (data: any) => {
         this.englishTokens = this.flatten(data);
+        if (Object.keys(this.englishTokens).length === 0) {
+          console.warn('Server en.json is empty, falling back to assets');
+          this.loadAssetEnglish();
+          return;
+        }
         this.detectMissing();
         // mark english as loaded for UI
         this.selectedFile = 'en.json';
@@ -82,21 +87,28 @@ export class TokenEditorComponent implements OnInit {
           } catch (e) {
             console.warn('Failed to parse saved english file from localStorage', e);
             this.lastError = 'Failed to parse saved english file from localStorage';
+            this.loadAssetEnglish();
           }
+        } else {
+          this.loadAssetEnglish();
         }
       }
     );
   }
 
   loadFiles() {
+    console.log('Requesting file list from server...');
     // Attempt to list files from server; ignore errors
     this.http.get<string[]>('https://dev.relatis.io:9444/files').subscribe(
       files => {
+        console.log('File list received:', files);
         this.files = files.filter(f => f.toLowerCase().endsWith('.json') && f.toLowerCase() !== 'images.json');
       },
-      () => { /* ignore server listing errors */ this.lastError = 'Could not fetch file list from server (server may be down)'; }
+      (err) => {
+        console.error('Error fetching file list:', err);
+        this.lastError = 'Could not fetch file list from server: ' + (err.message || err.statusText || err.status);
+      }
     );
-    console.log('Requested file list from server');
   }
 
   loadFile(name: string) {
@@ -105,6 +117,7 @@ export class TokenEditorComponent implements OnInit {
     console.log('Loading file from server:', name);
     this.http.get(`https://dev.relatis.io:9444/file/${name}`).subscribe(
       (data: any) => {
+        console.log('File loaded successfully:', name);
         const flat = this.flatten(data);
         if (name.toLowerCase() === 'en.json') {
           this.englishTokens = flat;
@@ -236,6 +249,10 @@ export class TokenEditorComponent implements OnInit {
 
   get englishCount(): number {
     return Object.keys(this.englishTokens || {}).length;
+  }
+
+  get tokensCount(): number {
+    return Object.keys(this.tokens || {}).length;
   }
 
   getTokensToShow(): string[] {
